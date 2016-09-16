@@ -36,37 +36,39 @@ app.controller('formularioController', function ($scope, $location, $http) {
   $scope.user = {};
   $scope.login = function () {
 
-    $http.post($('#formUser').attr('action'), $scope.user)
-            .then(function successCallback(response) { // success
-              console.log(response);
-              if (response.data.code == '200') {
-                $location.path('/bienvenida');
-              } else if (response.data.code == '500') {
-                $scope.mensajeError = response.data.msg;
-                $scope.msnError = true;
-              }
-            }, function errorCallback(response) { // optional // failed
-              console.log(response);
-            });
+//    $http.post($('#formUser').attr('action'), $scope.user)
+//            .then(function successCallback(response) { // success
+//              console.log(response);
+//              if (response.data.code == '200') {
+//                $location.path('/bienvenida');
+//              } else if (response.data.code == '500') {
+//                $scope.mensajeError = response.data.msg;
+//                $scope.msnError = true;
+//              }
+//            }, function errorCallback(response) { // optional // failed
+//              console.log(response);
+//            });
 
-//    $.ajax({
-//      url: $('#formUser').attr('action'),
-//      type: $('#formUser').attr('method'),
-//      data: $scope.user,
-//      dataType: 'json',
-//      success: function (data) {
-//        console.log(data);
-//        if (data.code == 200) {
-//          $location.path('/bienvenida');
-//        } else if (data.code == 500) {
-//          $scope.mensajeError = data.msg;
-//          $scope.msnError = true;
-//        }
-//      },
-//      error: function (objeto, quepaso, otroobj) {
-//
-//      }
-//    });
+    $.ajax({
+      url: $('#formUser').attr('action'),
+      type: $('#formUser').attr('method'),
+      data: $scope.user,
+      dataType: 'json',
+      success: function (data) {
+        $scope.$apply(function () {
+          console.log(data);
+          if (data.code == 200) {
+            $location.path('/bienvenida');
+          } else if (data.code == 500) {
+            $scope.mensajeError = data.msg;
+            $scope.msnError = true;
+          }
+        });
+      },
+      error: function (objeto, quepaso, otroobj) {
+
+      }
+    });
   };
 });
 
