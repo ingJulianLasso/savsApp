@@ -5,27 +5,50 @@ app.config(function ($routeProvider) {
     controller: 'indexController',
     templateUrl: 'app/templates/index.html'
   }).when('/otro', {
-    controller: 'otroController',
-    templateUrl: 'app/templates/otro.html'
+    controller: 'registroController',
+    templateUrl: 'app/templates/registro.html'
   }).when('/formulario', {
     controller: 'formularioController',
     templateUrl: 'app/templates/formulario.html'
   }).when('/bienvenida', {
     controller: 'bienvenidaController',
     templateUrl: 'app/templates/bienvenida.html'
+  }).otherwise({
+    redirectTo: '/'
   });
 });
 
 app.controller('indexController', function ($scope, $location) {
-  $scope.mensaje = 'Hola mundo desde AngularJS';
-  $scope.saludar = function () {
-    $location.path('/otro');
+  $scope.user = {};
+  $scope.iniciarSesion = function () {
+    $.ajax({
+      url: $('#formUser').attr('action'),
+      type: $('#formUser').attr('method'),
+      data: $scope.user,
+      dataType: 'json',
+      success: function (data) {
+        $scope.$apply(function () {
+          console.log(data);
+          if (data.code == 200) {
+            $location.path('/bienvenida');
+          } else if (data.code == 500) {
+            $scope.mensajeError = data.msg;
+            $scope.msnError = true;
+          }
+        });
+      },
+      error: function (objeto, quepaso, otroobj) {
+
+      }
+    });
+  };
+  $scope.pageRegistro = function () {
+    $location.path('/registro');
   };
 });
 
-app.controller('otroController', function ($scope, $location) {
-  $scope.mensaje = 'Este es otro mensja desde angular';
-  $scope.hola = function () {
+app.controller('registroController', function ($scope, $location) {
+  $scope.index = function () {
     $location.path('/');
   };
 });
