@@ -1,6 +1,8 @@
 <link rel="stylesheet" href="css/signin.css">
-<form id="formUser" action="http://localhost/" method="get" class="form-signin">
+<form id="formUser" action="http://localhost/senasoft/savsServer/login.php" method="post" class="form-signin">
   <h2 class="form-signin-heading">Please sign in</h2>
+  <div class="alert alert-danger" ng-show="msnError" >{{ mensajeError}}</div>
+  <div class="alert alert-success" ng-show="msnSuccess" >{{ mensajeSuccess}}</div>
   <input ng-model="user.user" type="text" id="inputUser" class="form-control" placeholder="Usuario" required autofocus>
   <input ng-model="user.password" type="password" id="inputPassword" class="form-control" placeholder="Contraseña" required>
   <div class="checkbox">
@@ -8,6 +10,6 @@
       <input ng-model="user.rememberme" type="checkbox"> Recordar inicio de sesión
     </label>
   </div>
-  <button class="btn btn-lg btn-primary btn-block" type="submit" ng-click="iniciarSesion()">Sign in</button>
+  <button class="btn btn-lg btn-primary btn-block" type="button" ng-click="iniciarSesion()">Sign in</button>
   <button class="btn btn-lg btn-default btn-block" type="button" ng-click="pageRegistro()">Registrar</button>
 </form>

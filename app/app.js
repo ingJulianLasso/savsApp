@@ -4,10 +4,7 @@ app.config(function ($routeProvider) {
   $routeProvider.when('/', {
     controller: 'indexController',
     templateUrl: 'app/templates/index.html'
-  }).when('/otro', {
-    controller: 'registroController',
-    templateUrl: 'app/templates/registro.html'
-  }).when('/formulario', {
+  }).when('/registro', {
     controller: 'formularioController',
     templateUrl: 'app/templates/formulario.html'
   }).when('/bienvenida', {
@@ -18,8 +15,16 @@ app.config(function ($routeProvider) {
   });
 });
 
-app.controller('indexController', function ($scope, $location) {
+app.controller('indexController', function ($scope, $location, $localStorage, $sessionStorage) {
+
+  if ($localStorage.session == true) {
+    $location.path('/bienvenida');
+  } else if ($sessionStorage.session == true) {
+    $location.path('/bienvenida');
+  }
+
   $scope.user = {};
+  $scope.msnError = false;
   $scope.iniciarSesion = function () {
     $.ajax({
       url: $('#formUser').attr('action'),
@@ -28,8 +33,12 @@ app.controller('indexController', function ($scope, $location) {
       dataType: 'json',
       success: function (data) {
         $scope.$apply(function () {
-          console.log(data);
           if (data.code == 200) {
+            if ($scope.user.rememberme == true) {
+              $localStorage.session = true;
+            } else {
+              $sessionStorage.session = true;
+            }
             $location.path('/bienvenida');
           } else if (data.code == 500) {
             $scope.mensajeError = data.msg;
@@ -47,44 +56,37 @@ app.controller('indexController', function ($scope, $location) {
   };
 });
 
-app.controller('registroController', function ($scope, $location) {
-  $scope.index = function () {
+app.controller('formularioController', function ($scope, $location, $http) {
+  $scope.registro = {};
+  $scope.pageInicio = function () {
     $location.path('/');
   };
-});
-
-app.controller('formularioController', function ($scope, $location, $http) {
-  $scope.msnError = false;
-  $scope.mensajeError = '';
-  $scope.user = {};
-  $scope.login = function () {
-
-//    $http.post($('#formUser').attr('action'), $scope.user)
-//            .then(function successCallback(response) { // success
-//              console.log(response);
-//              if (response.data.code == '200') {
-//                $location.path('/bienvenida');
-//              } else if (response.data.code == '500') {
-//                $scope.mensajeError = response.data.msg;
-//                $scope.msnError = true;
-//              }
-//            }, function errorCallback(response) { // optional // failed
-//              console.log(response);
-//            });
-
+  $scope.registrar = function () {
     $.ajax({
       url: $('#formUser').attr('action'),
       type: $('#formUser').attr('method'),
-      data: $scope.user,
+      data: $scope.registro,
       dataType: 'json',
       success: function (data) {
         $scope.$apply(function () {
-          console.log(data);
           if (data.code == 200) {
-            $location.path('/bienvenida');
-          } else if (data.code == 500) {
-            $scope.mensajeError = data.msg;
-            $scope.msnError = true;
+            $scope.mensajeSuccess = data.msg;
+            $scope.msnSuccess = true;
+            $location.path('/');
+          } else if (data.code == 300) {
+
+            if (typeof data.usuario !== 'undefined') {
+              $scope.errorUser = 'has-error';
+              $scope.msnErrorUser = true;
+              $scope.mensajeErrorUser = data.usuario.invalido;
+            }
+
+            if (typeof data.password.invalido !== 'undefined') {
+              $scope.errorPass = 'has-error';
+              $scope.msnErrorPass = true;
+              $scope.mensajeErrorPass = data.password.invalido;
+            }
+
           }
         });
       },
@@ -95,8 +97,13 @@ app.controller('formularioController', function ($scope, $location, $http) {
   };
 });
 
-app.controller('bienvenidaController', function ($scope, $location) {
-  $scope.volver = function () {
-    $location.path('/formulario');
+app.controller('bienvenidaController', function ($scope, $location, $localStorage, $sessionStorage) {
+  $scope.logout = function () {
+    if ($localStorage.session == true) {
+      delete $localStorage.session;
+    } else if ($sessionStorage.session == true) {
+      delete $sessionStorage.session;
+    }
+    $location.path('/');
   };
 });
